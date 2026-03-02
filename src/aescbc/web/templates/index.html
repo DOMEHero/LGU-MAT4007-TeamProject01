@@ -27,23 +27,35 @@
               <textarea id="enc-plaintext" rows="4" required></textarea>
 
               <label for="enc-key">Key (hex, 16/24/32 bytes)</label>
-              <input id="enc-key" type="text" required />
+              <div class="secret-field">
+                <input id="enc-key" type="password" required autocomplete="off" spellcheck="false" />
+                <button type="button" class="toggle-secret" data-target="enc-key">Show</button>
+              </div>
 
               <label for="enc-iv">IV (hex, optional 16 bytes)</label>
-              <input id="enc-iv" type="text" placeholder="leave empty for random IV" />
+              <div class="secret-field">
+                <input
+                  id="enc-iv"
+                  type="password"
+                  placeholder="leave empty for random IV"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button type="button" class="toggle-secret" data-target="enc-iv">Show</button>
+              </div>
 
               <button type="submit">Encrypt</button>
             </form>
 
             <div class="result">
-              <label for="out-iv">IV (hex)</label>
-              <input id="out-iv" type="text" readonly />
-
               <label for="out-ciphertext">Ciphertext (hex)</label>
               <textarea id="out-ciphertext" rows="3" readonly></textarea>
 
               <label for="out-tag">HMAC Tag (hex)</label>
-              <input id="out-tag" type="text" readonly />
+              <div class="secret-field">
+                <input id="out-tag" type="password" readonly autocomplete="off" spellcheck="false" />
+                <button type="button" class="toggle-secret" data-target="out-tag">Show</button>
+              </div>
             </div>
           </section>
 
@@ -54,10 +66,28 @@
               <input id="file-enc-input" type="file" required />
 
               <label for="file-enc-key">Key (hex, 16/24/32 bytes)</label>
-              <input id="file-enc-key" type="text" required />
+              <div class="secret-field">
+                <input
+                  id="file-enc-key"
+                  type="password"
+                  required
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button type="button" class="toggle-secret" data-target="file-enc-key">Show</button>
+              </div>
 
               <label for="file-enc-iv">IV (hex, optional 16 bytes)</label>
-              <input id="file-enc-iv" type="text" placeholder="leave empty for random IV" />
+              <div class="secret-field">
+                <input
+                  id="file-enc-iv"
+                  type="password"
+                  placeholder="leave empty for random IV"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button type="button" class="toggle-secret" data-target="file-enc-iv">Show</button>
+              </div>
 
               <button type="submit">Encrypt File</button>
             </form>
@@ -79,13 +109,22 @@
               <textarea id="dec-ciphertext" rows="3" required></textarea>
 
               <label for="dec-key">Key (hex)</label>
-              <input id="dec-key" type="text" required />
+              <div class="secret-field">
+                <input id="dec-key" type="password" required autocomplete="off" spellcheck="false" />
+                <button type="button" class="toggle-secret" data-target="dec-key">Show</button>
+              </div>
 
               <label for="dec-iv">IV (hex)</label>
-              <input id="dec-iv" type="text" required />
+              <div class="secret-field">
+                <input id="dec-iv" type="password" required autocomplete="off" spellcheck="false" />
+                <button type="button" class="toggle-secret" data-target="dec-iv">Show</button>
+              </div>
 
               <label for="dec-tag">HMAC Tag (hex)</label>
-              <input id="dec-tag" type="text" required />
+              <div class="secret-field">
+                <input id="dec-tag" type="password" required autocomplete="off" spellcheck="false" />
+                <button type="button" class="toggle-secret" data-target="dec-tag">Show</button>
+              </div>
 
               <button type="submit">Decrypt</button>
             </form>
@@ -103,7 +142,16 @@
               <input id="file-dec-input" type="file" required />
 
               <label for="file-dec-key">Key (hex, 16/24/32 bytes)</label>
-              <input id="file-dec-key" type="text" required />
+              <div class="secret-field">
+                <input
+                  id="file-dec-key"
+                  type="password"
+                  required
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button type="button" class="toggle-secret" data-target="file-dec-key">Show</button>
+              </div>
 
               <button type="submit">Decrypt File</button>
             </form>

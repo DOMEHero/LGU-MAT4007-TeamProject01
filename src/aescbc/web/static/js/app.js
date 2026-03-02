@@ -8,11 +8,24 @@ const DEMO_VALUES = {
 };
 
 let demoRunning = false;
+let lastEncryptedIvHex = "";
+let statusTimer = null;
 
 function setStatus(message, isError = false) {
   const el = $("status");
   el.textContent = message;
-  el.className = isError ? "status error" : "status ok";
+  el.className = isError ? "status error visible" : "status ok visible";
+
+  if (statusTimer) {
+    window.clearTimeout(statusTimer);
+  }
+
+  statusTimer = window.setTimeout(
+    () => {
+      el.classList.remove("visible");
+    },
+    isError ? 6000 : 3200,
+  );
 }
 
 function parseErrorPayload(data) {
@@ -104,10 +117,11 @@ async function typeLikeHuman(element, text, minDelay = 16, maxDelay = 52) {
 async function submitEncryptText() {
   setStatus("Encrypting text...");
 
+  const enteredIv = $("enc-iv").value.trim();
   const payload = {
     plaintext: $("enc-plaintext").value,
     key_hex: $("enc-key").value.trim(),
-    iv_hex: $("enc-iv").value.trim() || null,
+    iv_hex: enteredIv || null,
     errors: "strict",
   };
 
@@ -122,7 +136,10 @@ async function submitEncryptText() {
   }
 
   const data = await res.json();
-  $("out-iv").value = data.iv_hex;
+  lastEncryptedIvHex = data.iv_hex;
+  if (!enteredIv) {
+    $("enc-iv").value = data.iv_hex;
+  }
   $("out-ciphertext").value = data.ciphertext_hex;
   $("out-tag").value = data.tag_hex;
   setStatus("Text encryption complete.");
@@ -168,7 +185,7 @@ async function runTypingDemo() {
   try {
     setStatus("Demo: typing encryption inputs...");
 
-    $("out-iv").value = "";
+    lastEncryptedIvHex = "";
     $("out-ciphertext").value = "";
     $("out-tag").value = "";
     $("out-plaintext").value = "";
@@ -181,7 +198,7 @@ async function runTypingDemo() {
     await sleep(350);
 
     const producedCiphertext = $("out-ciphertext").value.trim();
-    const producedIv = $("out-iv").value.trim();
+    const producedIv = lastEncryptedIvHex || $("enc-iv").value.trim();
     const producedTag = $("out-tag").value.trim();
 
     setStatus("Demo: typing decryption ciphertext/key/iv/tag...");
@@ -200,6 +217,27 @@ async function runTypingDemo() {
       button.disabled = false;
     }
   }
+}
+
+function bindSecretToggles() {
+  const toggleButtons = document.querySelectorAll(".toggle-secret");
+  toggleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.target;
+      if (!targetId) {
+        return;
+      }
+
+      const input = $(targetId);
+      if (!input) {
+        return;
+      }
+
+      const nextType = input.type === "password" ? "text" : "password";
+      input.type = nextType;
+      button.textContent = nextType === "password" ? "Show" : "Hide";
+    });
+  });
 }
 
 $("encrypt-form").addEventListener("submit", async (event) => {
@@ -226,6 +264,8 @@ if (demoButton) {
     void runTypingDemo();
   });
 }
+
+bindSecretToggles();
 
 $("file-encrypt-form").addEventListener("submit", async (event) => {
   event.preventDefault();
