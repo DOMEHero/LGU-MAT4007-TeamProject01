@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aes-cbc"
+version = "0.1.0"
+description = "A small implementation of AES-CBC encryption"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "LGU MAT4007 GROUP 1" }
+]
+dependencies = [
+  "fastapi>=0.116.0",
+  "uvicorn[standard]>=0.35.0",
+  "jinja2>=3.1.6",
+  "python-multipart>=0.0.20",
+  "pydantic>=2.11.0",
+  "charset-normalizer>=3.4.0"
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4.0",
+  "httpx>=0.28.0"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aescbc"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

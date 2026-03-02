@@ -1,0 +1,11 @@
+# Optional compatibility export.
+# Source of truth for dependencies is pyproject.toml (managed with uv).
+
+fastapi>=0.116.0
+uvicorn[standard]>=0.35.0
+jinja2>=3.1.6
+python-multipart>=0.0.20
+pydantic>=2.11.0
+charset-normalizer>=3.4.0
+pytest>=8.4.0
+httpx>=0.28.0

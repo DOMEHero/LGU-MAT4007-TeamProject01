@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AES-CBC Demo</title>
+    <link rel="stylesheet" href="/static/css/styles.css?v={{ asset_version }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <h1>AES-CBC Encryption</h1>
+        <p class="subtitle">From-scratch AES core with CBC mode, PKCS#7 padding, and authentication.</p>
+      </header>
+
+      <section class="workflow">
+        <div class="lane">
+          <h2 class="lane-title">Encryption</h2>
+
+          <section class="card">
+            <h3>Encrypt Text</h3>
+            <form id="encrypt-form">
+              <label for="enc-plaintext">Plaintext</label>
+              <textarea id="enc-plaintext" rows="4" required></textarea>
+
+              <label for="enc-key">Key (hex, 16/24/32 bytes)</label>
+              <input id="enc-key" type="text" required />
+
+              <label for="enc-iv">IV (hex, optional 16 bytes)</label>
+              <input id="enc-iv" type="text" placeholder="leave empty for random IV" />
+
+              <button type="submit">Encrypt</button>
+            </form>
+
+            <div class="result">
+              <label for="out-iv">IV (hex)</label>
+              <input id="out-iv" type="text" readonly />
+
+              <label for="out-ciphertext">Ciphertext (hex)</label>
+              <textarea id="out-ciphertext" rows="3" readonly></textarea>
+
+              <label for="out-tag">HMAC Tag (hex)</label>
+              <input id="out-tag" type="text" readonly />
+            </div>
+          </section>
+
+          <section class="card">
+            <h3>Encrypt File</h3>
+            <form id="file-encrypt-form">
+              <label for="file-enc-input">File</label>
+              <input id="file-enc-input" type="file" required />
+
+              <label for="file-enc-key">Key (hex, 16/24/32 bytes)</label>
+              <input id="file-enc-key" type="text" required />
+
+              <label for="file-enc-iv">IV (hex, optional 16 bytes)</label>
+              <input id="file-enc-iv" type="text" placeholder="leave empty for random IV" />
+
+              <button type="submit">Encrypt File</button>
+            </form>
+
+            <div class="result">
+              <label for="file-enc-meta">Detected Metadata</label>
+              <textarea id="file-enc-meta" rows="4" readonly></textarea>
+            </div>
+          </section>
+        </div>
+
+        <div class="lane">
+          <h2 class="lane-title">Decryption</h2>
+
+          <section class="card">
+            <h3>Decrypt Text</h3>
+            <form id="decrypt-form">
+              <label for="dec-ciphertext">Ciphertext (hex)</label>
+              <textarea id="dec-ciphertext" rows="3" required></textarea>
+
+              <label for="dec-key">Key (hex)</label>
+              <input id="dec-key" type="text" required />
+
+              <label for="dec-iv">IV (hex)</label>
+              <input id="dec-iv" type="text" required />
+
+              <label for="dec-tag">HMAC Tag (hex)</label>
+              <input id="dec-tag" type="text" required />
+
+              <button type="submit">Decrypt</button>
+            </form>
+
+            <div class="result">
+              <label for="out-plaintext">Plaintext</label>
+              <textarea id="out-plaintext" rows="3" readonly></textarea>
+            </div>
+          </section>
+
+          <section class="card">
+            <h3>Decrypt File</h3>
+            <form id="file-decrypt-form">
+              <label for="file-dec-input">Encrypted File (.enc)</label>
+              <input id="file-dec-input" type="file" required />
+
+              <label for="file-dec-key">Key (hex, 16/24/32 bytes)</label>
+              <input id="file-dec-key" type="text" required />
+
+              <button type="submit">Decrypt File</button>
+            </form>
+
+            <div class="result">
+              <label for="file-dec-meta">Recovered Metadata</label>
+              <textarea id="file-dec-meta" rows="4" readonly></textarea>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <p id="status" class="status"></p>
+    </main>
+
+    <script src="/static/js/app.js?v={{ asset_version }}"></script>
+  </body>
+</html>
