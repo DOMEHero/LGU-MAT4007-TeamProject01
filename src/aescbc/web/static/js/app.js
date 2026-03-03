@@ -1,11 +1,103 @@
 const $ = (id) => document.getElementById(id);
 
-const DEMO_VALUES = {
-  plaintext:
-    "Gather ye rosebuds while ye may,\n   Old Time is still a-flying;\nAnd this same flower that smiles today\n   Tomorrow will be dying.",
-  keyHex: "4d45749a26c79ea5a52a2dade16903beaf99f652481907b7305f3315101488e0",
-  ivHex: "b203e94afcc0acff4472b99f14664a50",
-};
+const FALLBACK_ENGLISH_VERSES = [
+  "Gather ye rosebuds while ye may,\n   Old Time is still a-flying;\nAnd this same flower that smiles today\n   Tomorrow will be dying.",
+  "Shall I compare thee to a summer's day?\nThou art more lovely and more temperate.",
+  "Hope is the thing with feathers\nThat perches in the soul,\nAnd sings the tune without the words,\nAnd never stops at all.",
+];
+
+const FALLBACK_CHINESE_VERSES = [
+  "海上生明月，天涯共此时。",
+  "但愿人长久，千里共婵娟。",
+  "落霞与孤鹜齐飞，秋水共长天一色。",
+];
+
+function randomFallbackPlaintext() {
+  const allVerses = [...FALLBACK_ENGLISH_VERSES, ...FALLBACK_CHINESE_VERSES];
+  return allVerses[randomInt(0, allVerses.length - 1)];
+}
+
+function randomHex(byteLength) {
+  const bytes = new Uint8Array(byteLength);
+  if (window.crypto?.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < bytes.length; i += 1) {
+      bytes[i] = randomInt(0, 255);
+    }
+  }
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function normalizeDemoVerse(text, maxChars = 260) {
+  const normalized = String(text || "").replace(/\r\n/g, "\n").trim();
+  if (!normalized) {
+    return "";
+  }
+  if (normalized.length <= maxChars) {
+    return normalized;
+  }
+  return `${normalized.slice(0, maxChars).trimEnd()}...`;
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+async function fetchEnglishVerseOnline() {
+  const data = await fetchJsonWithTimeout("https://poetrydb.org/random", 5000);
+  const poem = Array.isArray(data) ? data[0] : null;
+  if (!poem || !Array.isArray(poem.lines) || poem.lines.length === 0) {
+    throw new Error("Invalid English verse payload");
+  }
+  return normalizeDemoVerse(poem.lines.slice(0, 4).join("\n"));
+}
+
+async function fetchChineseVerseOnline() {
+  const data = await fetchJsonWithTimeout("https://v1.jinrishici.com/all.json", 5000);
+  const content = typeof data?.content === "string" ? data.content.trim() : "";
+  const origin = typeof data?.origin === "string" ? data.origin.trim() : "";
+  if (!content) {
+    throw new Error("Invalid Chinese verse payload");
+  }
+  return normalizeDemoVerse(origin ? `${content}\n——《${origin}》` : content);
+}
+
+async function randomDemoPlaintextFromOnline() {
+  const fetchers = [fetchEnglishVerseOnline, fetchChineseVerseOnline];
+  if (Math.random() < 0.5) {
+    fetchers.reverse();
+  }
+
+  for (const fetcher of fetchers) {
+    try {
+      const verse = await fetcher();
+      if (verse) {
+        return verse;
+      }
+    } catch (_) {
+      // Try the other source, then fall back to local verse list.
+    }
+  }
+
+  return randomFallbackPlaintext();
+}
 
 let demoRunning = false;
 let lastEncryptedIvHex = "";
@@ -137,6 +229,28 @@ async function submitDecryptText() {
   setStatus("Text decryption complete.");
 }
 
+function clearAllDemoFields() {
+  const ids = [
+    "enc-plaintext",
+    "enc-key",
+    "enc-iv",
+    "out-ciphertext",
+    "out-tag",
+    "dec-ciphertext",
+    "dec-key",
+    "dec-iv",
+    "dec-tag",
+    "out-plaintext",
+  ];
+
+  ids.forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.value = "";
+    }
+  });
+}
+
 async function runTypingDemo() {
   if (demoRunning) {
     return;
@@ -149,16 +263,19 @@ async function runTypingDemo() {
   }
 
   try {
+    clearAllDemoFields();
+    lastEncryptedIvHex = "";
+
+    setStatus("Demo: fetching a random verse online...");
+    const demoPlaintext = await randomDemoPlaintextFromOnline();
+    const demoKeyHex = randomHex(32);
+    const demoIvHex = randomHex(16);
+
     setStatus("Demo: typing encryption inputs...");
 
-    lastEncryptedIvHex = "";
-    $("out-ciphertext").value = "";
-    $("out-tag").value = "";
-    $("out-plaintext").value = "";
-
-    await typeLikeHuman($("enc-plaintext"), DEMO_VALUES.plaintext, 22, 54);
-    await typeLikeHuman($("enc-key"), DEMO_VALUES.keyHex, 8, 26);
-    await typeLikeHuman($("enc-iv"), DEMO_VALUES.ivHex, 8, 26);
+    await typeLikeHuman($("enc-plaintext"), demoPlaintext, 22, 54);
+    await typeLikeHuman($("enc-key"), demoKeyHex, 8, 26);
+    await typeLikeHuman($("enc-iv"), demoIvHex, 8, 26);
 
     await submitEncryptText();
     await sleep(350);
@@ -169,7 +286,7 @@ async function runTypingDemo() {
 
     setStatus("Demo: typing decryption ciphertext/key/iv/tag...");
     await typeLikeHuman($("dec-ciphertext"), producedCiphertext, 1, 8);
-    await typeLikeHuman($("dec-key"), DEMO_VALUES.keyHex, 8, 26);
+    await typeLikeHuman($("dec-key"), demoKeyHex, 8, 26);
     await typeLikeHuman($("dec-iv"), producedIv, 8, 26);
     await typeLikeHuman($("dec-tag"), producedTag, 8, 26);
 
