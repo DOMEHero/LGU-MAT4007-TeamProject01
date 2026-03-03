@@ -10,6 +10,7 @@ const DEMO_VALUES = {
 let demoRunning = false;
 let lastEncryptedIvHex = "";
 let statusTimer = null;
+let secretsVisible = false;
 
 function setStatus(message, isError = false) {
   const el = $("status");
@@ -79,6 +80,8 @@ async function typeLikeHuman(element, text, minDelay = 16, maxDelay = 52) {
 
 async function submitEncryptText() {
   setStatus("Encrypting text...");
+  $("out-ciphertext").value = "";
+  $("out-tag").value = "";
 
   const enteredIv = $("enc-iv").value.trim();
   const payload = {
@@ -184,21 +187,26 @@ async function runTypingDemo() {
 
 function bindSecretToggles() {
   const toggleButtons = document.querySelectorAll(".toggle-secret");
+  const secretInputs = document.querySelectorAll(".secret-field input");
+
+  const setSecretsVisible = (visible) => {
+    secretInputs.forEach((input) => {
+      input.type = visible ? "text" : "password";
+    });
+
+    toggleButtons.forEach((button) => {
+      button.textContent = visible ? "Hide" : "Show";
+      button.setAttribute("aria-pressed", visible ? "true" : "false");
+    });
+
+    secretsVisible = visible;
+  };
+
+  setSecretsVisible(false);
+
   toggleButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const targetId = button.dataset.target;
-      if (!targetId) {
-        return;
-      }
-
-      const input = $(targetId);
-      if (!input) {
-        return;
-      }
-
-      const nextType = input.type === "password" ? "text" : "password";
-      input.type = nextType;
-      button.textContent = nextType === "password" ? "Show" : "Hide";
+      setSecretsVisible(!secretsVisible);
     });
   });
 }

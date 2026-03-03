@@ -3,101 +3,127 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AES-CBC Demo</title>
+    <title>AES-CBC Encryption &amp; Decryption</title>
     <link rel="stylesheet" href="/static/css/styles.css?v={{ asset_version }}" />
   </head>
   <body>
     <main class="container">
       <header class="hero">
-        <h1>AES-CBC Encryption</h1>
-        <p class="subtitle">From-scratch AES core with CBC mode, PKCS#7 padding, and authentication.</p>
+        <h1>AES-CBC Encryption &amp; Decryption</h1>
+        <p class="subtitle">CBC mode with HMAC-SHA256 authentication</p>
         <div class="hero-actions">
-          <button id="run-demo-btn" type="button">Run Typing Demo</button>
+          <button id="run-demo-btn" type="button" class="demo-btn">Run Typing Demo</button>
         </div>
       </header>
 
       <section class="workflow">
-        <div class="lane">
-          <h2 class="lane-title">Encryption</h2>
+        <section class="panel">
+          <h2 class="panel-title">Encrypt</h2>
 
-          <section class="card">
-            <h3>Encrypt Text</h3>
-            <form id="encrypt-form">
-              <label for="enc-plaintext">Plaintext</label>
-              <textarea id="enc-plaintext" rows="4" required></textarea>
+          <form id="encrypt-form" class="panel-form">
+            <label class="sr-only" for="enc-plaintext">Plaintext</label>
+            <textarea id="enc-plaintext" rows="5" placeholder="Enter plaintext..." required></textarea>
 
-              <label for="enc-key">Key (hex, 16/24/32 bytes)</label>
-              <div class="secret-field">
-                <input id="enc-key" type="password" required autocomplete="off" spellcheck="false" />
-                <button type="button" class="toggle-secret" data-target="enc-key">Show</button>
-              </div>
-
-              <label for="enc-iv">IV (hex, optional 16 bytes)</label>
-              <div class="secret-field">
-                <input
-                  id="enc-iv"
-                  type="password"
-                  placeholder="leave empty for random IV"
-                  autocomplete="off"
-                  spellcheck="false"
-                />
-                <button type="button" class="toggle-secret" data-target="enc-iv">Show</button>
-              </div>
-
-              <button type="submit">Encrypt</button>
-            </form>
-
-            <div class="result">
-              <label for="out-ciphertext">Ciphertext (hex)</label>
-              <textarea id="out-ciphertext" rows="3" readonly></textarea>
-
-              <label for="out-tag">HMAC Tag (hex)</label>
-              <div class="secret-field">
-                <input id="out-tag" type="password" readonly autocomplete="off" spellcheck="false" />
-                <button type="button" class="toggle-secret" data-target="out-tag">Show</button>
-              </div>
+            <label class="sr-only" for="enc-key">Key (hex)</label>
+            <div class="secret-field">
+              <input
+                id="enc-key"
+                type="password"
+                placeholder="Key (hex, 16 / 24 / 32 bytes)..."
+                required
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="toggle-secret" data-target="enc-key">Show</button>
             </div>
-          </section>
 
-        </div>
-
-        <div class="lane">
-          <h2 class="lane-title">Decryption</h2>
-
-          <section class="card">
-            <h3>Decrypt Text</h3>
-            <form id="decrypt-form">
-              <label for="dec-ciphertext">Ciphertext (hex)</label>
-              <textarea id="dec-ciphertext" rows="3" required></textarea>
-
-              <label for="dec-key">Key (hex)</label>
-              <div class="secret-field">
-                <input id="dec-key" type="password" required autocomplete="off" spellcheck="false" />
-                <button type="button" class="toggle-secret" data-target="dec-key">Show</button>
-              </div>
-
-              <label for="dec-iv">IV (hex)</label>
-              <div class="secret-field">
-                <input id="dec-iv" type="password" required autocomplete="off" spellcheck="false" />
-                <button type="button" class="toggle-secret" data-target="dec-iv">Show</button>
-              </div>
-
-              <label for="dec-tag">HMAC Tag (hex)</label>
-              <div class="secret-field">
-                <input id="dec-tag" type="password" required autocomplete="off" spellcheck="false" />
-                <button type="button" class="toggle-secret" data-target="dec-tag">Show</button>
-              </div>
-
-              <button type="submit">Decrypt</button>
-            </form>
-
-            <div class="result">
-              <label for="out-plaintext">Plaintext</label>
-              <textarea id="out-plaintext" rows="3" readonly></textarea>
+            <label class="sr-only" for="enc-iv">IV (hex)</label>
+            <div class="secret-field">
+              <input
+                id="enc-iv"
+                type="password"
+                placeholder="IV (hex, 16 bytes, optional — auto-generated if empty)..."
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="toggle-secret" data-target="enc-iv">Show</button>
             </div>
-          </section>
 
-        </div>
+            <button type="submit" class="action-btn">Encrypt</button>
+          </form>
+
+          <div class="result output-box">
+            <label for="out-ciphertext">Ciphertext</label>
+            <textarea id="out-ciphertext" rows="3" readonly placeholder="Output will appear here..."></textarea>
+
+            <label for="out-tag">HMAC Tag</label>
+            <div class="secret-field">
+              <input id="out-tag" type="password" readonly autocomplete="off" spellcheck="false" />
+              <button type="button" class="toggle-secret" data-target="out-tag">Show</button>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Decrypt</h2>
+
+          <form id="decrypt-form" class="panel-form">
+            <label class="sr-only" for="dec-ciphertext">Ciphertext (hex)</label>
+            <textarea id="dec-ciphertext" rows="5" placeholder="Ciphertext (hex)..." required></textarea>
+
+            <label class="sr-only" for="dec-key">Key (hex)</label>
+            <div class="secret-field">
+              <input
+                id="dec-key"
+                type="password"
+                placeholder="Key (hex)..."
+                required
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="toggle-secret" data-target="dec-key">Show</button>
+            </div>
+
+            <label class="sr-only" for="dec-iv">IV (hex)</label>
+            <div class="secret-field">
+              <input
+                id="dec-iv"
+                type="password"
+                placeholder="IV (hex)..."
+                required
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="toggle-secret" data-target="dec-iv">Show</button>
+            </div>
+
+            <label class="sr-only" for="dec-tag">HMAC Tag (hex)</label>
+            <div class="secret-field">
+              <input
+                id="dec-tag"
+                type="password"
+                placeholder="HMAC Tag (hex)..."
+                required
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="toggle-secret" data-target="dec-tag">Show</button>
+            </div>
+
+            <button type="submit" class="action-btn">Decrypt</button>
+          </form>
+
+          <div class="result output-box">
+            <label for="out-plaintext">Plaintext</label>
+            <textarea
+              id="out-plaintext"
+              rows="4"
+              readonly
+              placeholder="Plaintext output will appear here..."
+            ></textarea>
+          </div>
+        </section>
       </section>
 
       <p id="status" class="status"></p>
