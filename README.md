@@ -5,18 +5,13 @@ A small AES-CBC encryption implementation with a from-scratch AES core, PKCS#7 p
 ## Quick Start
 
 ```bash
-uv sync --group dev
-uv run pytest
-uv run uvicorn aescbc.main:app --reload --app-dir src
+uv sync
+uv run uvicorn aescbc.main:app --app-dir src
 ```
 
 Open `http://127.0.0.1:8000`.
 
-## API Endpoints
-
-- `GET /api/health`
-- `POST /api/encrypt` (JSON text encrypt)
-- `POST /api/decrypt` (JSON text decrypt)
+For development setup, architecture notes, API details, and change workflow, see [docs/dev-manual.md](docs/dev-manual.md).
 
 ## Security Note
 
